@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lightbulb, Trophy, Users, Target, Rocket, Star } from 'lucide-react';
+import { Lightbulb, Trophy, Users, Target, Rocket, Star, Book } from 'lucide-react';
+import ProgramCard from '@/components/ui/ProgramCard';
+import programs from '@/data/programs';
+
 
 const Home = () => {
   const features = [
@@ -191,6 +194,36 @@ const Home = () => {
           </motion.div>
         </div>
       </section>
+      {/* Programs Section */}
+<section className="py-20 px-6 bg-[#002349]">
+  <div className="max-w-7xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="text-center mb-12"
+    >
+      <h2 className="text-4xl md:text-5xl font-bold gradient-text mb-4">Explore Our Programs</h2>
+      <p className="text-xl text-white/80 max-w-3xl mx-auto">
+        Learn real-world skills with our expertly designed bootcamps.
+      </p>
+    </motion.div>
+
+    <div className="grid gap-8 md:grid-cols-3">
+      {programs.map((program) => (
+        <motion.div
+          key={program.id}
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <ProgramCard program={program} />
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
     </div>
   );
 };

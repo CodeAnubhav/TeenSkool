@@ -8,9 +8,9 @@ const Navigation = () => {
 
   const navItems = [
     { path: '/', label: 'Home', icon: Home },
-    { path: '/submit', label: 'Submit Idea', icon: Send },
-    { path: '/winners', label: 'Winners', icon: Trophy },
     { path: '/about', label: 'About', icon: Users },
+    // { path: '/winners', label: 'Winners', icon: Trophy },
+    { path: '/submit', label: 'Submit Idea', icon: Send },
   ];
 
   return (
