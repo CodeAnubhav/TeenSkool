@@ -1,0 +1,103 @@
+/* Import a modern, clean font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Define CSS variables for our light theme.
+    This is based on a slate and yellow color palette, matching our new design.
+    These variables can be used by Tailwind's utility classes and our custom components.
+  */
+  :root {
+    --background: 0 0% 100%; /* White */
+    --foreground: 222.2 47.4% 11.2%; /* slate-900 */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --primary: 47.9 95.8% 53.1%; /* yellow-500 */
+    --primary-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+
+    --secondary: 210 40% 96.1%; /* slate-100 */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+
+    --muted: 210 40% 96.1%; /* slate-100 */
+    --muted-foreground: 215.4 16.3% 46.9%; /* slate-500 */
+
+    --accent: 210 40% 96.1%; /* slate-100 */
+    --accent-foreground: 222.2 47.4% 11.2%; /* slate-900 */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%; /* slate-200 */
+    --input: 214.3 31.8% 91.4%; /* slate-200 */
+    --ring: 47.9 95.8% 53.1%; /* yellow-500 */
+
+    --radius: 0.75rem;
+  }
+
+  /* We are not using a dark theme right now, but this is where it would go.
+    For now, it's commented out.
+  */
+  /*
+  .dark {
+    --background: 222.2 47.4% 11.2%;
+    --foreground: 210 40% 98%;
+    ...etc
+  }
+  */
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Adds smooth scrolling behavior for anchor links */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Set up some basic typography styles for consistency */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+/* Custom utility classes can be defined here.
+  We've removed the old ones like .glass-effect and .hero-pattern
+  that are no longer needed in the new design.
+  You can add new, reusable component styles here if needed.
+*/
+@layer components {
+  /* Example: .btn-primary */
+  /*
+  .btn-primary {
+    @apply py-2 px-4 bg-primary text-primary-foreground rounded-md;
+  }
+  */
+}
+
+@keyframes scrollGrid {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100px 100px;
+  }
+}
+
+.animate-grid-scroll {
+  animation: scrollGrid 20s linear infinite;
+}
