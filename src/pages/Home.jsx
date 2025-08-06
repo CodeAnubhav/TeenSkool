@@ -1,7 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import programs from "../data/programs"; // Assuming you have a separate file for program data
+import programs from "../data/programs";
+import ProgramCard from "../components/ui/ProgramCard";
 import {
   ArrowUpRight,
   Building2,
@@ -120,33 +121,18 @@ const Home = () => {
             viewport={{ once: true, amount: 0.5 }}
             className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xl space-y-4"
           >
-            <div className="rounded-lg overflow-hidden aspect-video">
-              <Link
-                to="https://www.youtube.com/watch?si=q4YuPSi1GJIvZYYW&v=o4QXiKLv9yo&feature=youtu.be"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block relative rounded-lg overflow-hidden group"
-              >
-                <img
-                  src="https://img.youtube.com/vi/EeRpwBOPOxg/hqdefault.jpg"
-                  alt="Watch video"
-                  className="w-full object-cover aspect-video"
-                />
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-100 opacity-100 md:opacity-0">
-                  <div className="bg-white/20 backdrop-blur-sm p-4 rounded-full">
-                    <svg
-                      className="w-12 h-12 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M10 8l6 4-6 4V8z" />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
+            <div className="rounded-lg overflow-hidden aspect-video shadow-md">
+              <iframe
+                className="w-full aspect-video rounded-xl border border-slate-200 shadow-xl"
+                src="https://www.youtube.com/embed/fa8k8IQ1_X0"
+                title="AI Workshop Teenskool"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
             </div>
             <p className="text-slate-600 font-semibold text-center text-sm">
-              Watch: Students pitch their startups at Demo Day
+              Watch: How AI Can Help You Stand Out in the 21st Century
             </p>
           </motion.div>
         </div>
@@ -435,50 +421,7 @@ const Home = () => {
           </motion.div>
           <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
             {programs.map((program) => (
-              <motion.div
-                key={program.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="relative group block rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
-              >
-                <Link to={`/program/${program.id}`} className="block h-full">
-                  <div className="relative overflow-hidden aspect-video">
-                    <img
-                      src={program.image}
-                      alt={program.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6 flex flex-col h-full">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-yellow-500 transition-colors duration-300">
-                      {program.title}
-                    </h3>
-                    <p className="text-slate-600 text-base mb-4">
-                      {program.description}
-                    </p>
-                    {program.features?.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {program.features.map((feature, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-yellow-400/20 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-200">
-                      <span className="text-xl font-bold text-yellow-500">
-                        ₹{program.price}
-                      </span>
-                      <ArrowUpRight className="w-6 h-6 text-slate-400 group-hover:text-yellow-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
+              <ProgramCard key={program.id} program={program} />
             ))}
           </div>
         </div>

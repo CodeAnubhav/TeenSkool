@@ -121,7 +121,7 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="mt-12 pt-8 border-t border-slate-200 text-center">
           <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} Teenskool. All rights reserved.
+            © {new Date().getFullYear()} Teenskool. All rights reserved. <br></br> Code and crafted with ❤️ by the Teenskool.
           </p>
         </div>
       </div>

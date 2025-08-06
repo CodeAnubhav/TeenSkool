@@ -2,12 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
-// This component is used on the Home page to display a summary of each program.
 export default function ProgramCard({ program }) {
-  // Fallback for image in case the provided one fails
   const handleImageError = (e) => {
     e.target.onerror = null;
-    e.target.src = `https://placehold.co/600x400/e2e8f0/475569?text=Image+Not+Found`;
+    e.target.src = 'https://placehold.co/600x400/e2e8f0/475569?text=Image+Not+Found';
   };
 
   return (
@@ -16,36 +14,38 @@ export default function ProgramCard({ program }) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
-      className="relative group" // Group for hover effects on child elements
+      className="group relative transition-all duration-300"
     >
-      <Link to={`/program/${program.id}`} className="block h-full">
-        <div className="block h-full rounded-2xl overflow-hidden bg-white shadow-lg border border-slate-200/80 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-          {/* Program Image */}
-          <div className="relative overflow-hidden aspect-video">
+      <Link to={`/program/${program.id.trim()}`} className="block h-full">
+        <div className="flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+          
+          {/* Image */}
+          <div className="relative h-52 md:h-56 w-full overflow-hidden">
             <img
               src={program.image}
-              alt={program.title}
               onError={handleImageError}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              alt={program.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
 
-          {/* Content Section */}
-          <div className="p-6 flex flex-col h-full">
-            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-yellow-600 transition-colors duration-300">
+          {/* Content */}
+          <div className="p-6 flex flex-col flex-grow">
+            <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2 group-hover:text-yellow-600 transition-colors duration-300">
               {program.title}
             </h3>
-            <p className="text-slate-600 text-sm mb-4 flex-grow">
+
+            <p className="text-sm text-slate-600 mb-4 flex-grow">
               {program.shortDescription}
             </p>
 
-            {/* Feature Tags */}
+            {/* Features */}
             {program.features?.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
-                {program.features.map((feature, idx) => (
+                {program.features.map((feature, i) => (
                   <span
-                    key={idx}
-                    className="bg-yellow-400/20 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full"
+                    key={i}
+                    className="bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1 rounded-full"
                   >
                     {feature}
                   </span>
@@ -53,12 +53,12 @@ export default function ProgramCard({ program }) {
               </div>
             )}
 
-            {/* Footer of the card */}
-            <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-200">
+            {/* Footer */}
+            <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
               <span className="text-xl font-bold text-yellow-500">
                 ₹{program.price}
               </span>
-              <ArrowUpRight className="w-6 h-6 text-slate-400 group-hover:text-yellow-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+              <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-yellow-500 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
             </div>
           </div>
         </div>
