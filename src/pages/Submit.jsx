@@ -1,209 +1,164 @@
-  import React, { useState, useContext } from 'react';
-  import { motion } from 'framer-motion';
-  import { Button } from '@/components/ui/button';
-  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-  import { useToast } from '@/components/ui/use-toast';
-  import { Send, Lightbulb, AlertTriangle, Database } from 'lucide-react';
-  import { SupabaseContext } from '@/contexts/SupabaseContext';
-  import PersonalInfoForm from '@/components/submit/PersonalInfoForm';
-  import SchoolInfoForm from '@/components/submit/SchoolInfoForm';
-  import IdeaInfoForm from '@/components/submit/IdeaInfoForm';
-  import { initialFormData, categories, states } from '@/components/submit/formData';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useToast } from '@/components/ui/use-toast';
+import { Send, Lightbulb, Loader2 } from 'lucide-react';
 
-  const Submit = () => {
-    const { toast } = useToast();
-    const { supabase, integrationCompleted } = useContext(SupabaseContext);
-    const [formData, setFormData] = useState(initialFormData);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+// Consistent background pattern (Unchanged)
+const GridPattern = () => (
+  <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
+);
 
-    const handleInputChange = (field, value) => {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    };
+// --- Reusable InputField Component ---
+// This encapsulates the input logic, making the main form cleaner and more declarative.
+const InputField = ({ id, label, className = '', ...props }) => (
+  <div className={className}>
+    <label htmlFor={id} className="block text-sm font-medium text-slate-700 mb-1">
+      {label}
+    </label>
+    <input
+      id={id}
+      className="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+      {...props}
+    />
+  </div>
+);
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setIsSubmitting(true);
-      
-      const requiredFields = ['studentName', 'email', 'age', 'schoolName', 'city', 'state', 'ideaTitle', 'category', 'description'];
-      const missingFields = requiredFields.filter(field => !formData[field]);
-      
-      if (missingFields.length > 0) {
-        toast({
-          title: "Missing Information",
-          description: `Please fill in the following required fields: ${missingFields.join(', ')}.`,
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
-        return;
-      }
+// --- Form Fields Configuration ---
+// Adding a `className` property allows us to control the grid layout from our data.
+const formFields = [
+    { label: 'Full Name', name: 'name', type: 'text', placeholder: 'e.g., Ananya Verma', className: 'md:col-span-2' },
+    { label: 'Age', name: 'age', type: 'number', placeholder: 'e.g., 14' },
+    { label: 'Class/Grade', name: 'grade', type: 'text', placeholder: 'e.g., 9th' },
+    { label: 'School Name', name: 'school', type: 'text', placeholder: 'e.g., DPS Gurgaon', className: 'md:col-span-2' },
+    { label: 'City', name: 'city', type: 'text', placeholder: 'e.g., Delhi' },
+    { label: 'Phone Number', name: 'phone', type: 'tel', placeholder: 'e.g., 9876543210' },
+    { label: 'Email Address', name: 'email', type: 'email', placeholder: 'e.g., ananya@example.com', className: 'md:col-span-2' },
+    { label: 'Interested Program', name: 'program', type: 'text', placeholder: 'e.g., AI Bootcamp', className: 'md:col-span-2' },
+];
 
-      const newSubmissionData = {
-        student_name: formData.studentName,
-        email: formData.email,
-        phone: formData.phone,
-        age: parseInt(formData.age, 10),
-        grade: formData.grade,
-        school_name: formData.schoolName,
-        city: formData.city,
-        state: formData.state,
-        idea_title: formData.ideaTitle,
-        category: formData.category,
-        description: formData.description,
-        problem_solves: formData.problem,
-        solution_details: formData.solution,
-        target_audience: formData.target,
-        uniqueness_details: formData.uniqueness,
-        submitted_at: new Date().toISOString(),
-        status: 'pending'
-      };
+const ApplicationForm = () => {
+  const { toast } = useToast();
+  const [form, setForm] = useState({
+    name: '', age: '', school: '', grade: '', city: '', phone: '', email: '', program: '',
+  });
+  const [loading, setLoading] = useState(false);
 
-      if (integrationCompleted && supabase) {
-        try {
-          const { error } = await supabase
-            .from('idea_submissions')
-            .insert([newSubmissionData]);
-
-          if (error) {
-            throw error;
-          }
-
-          toast({
-            title: "Idea Submitted to Supabase! 🎉",
-            description: "Thank you! Your innovative idea has been securely saved."
-          });
-        } catch (error) {
-          console.error("Error submitting to Supabase:", error);
-          toast({
-            title: "Supabase Submission Error",
-            description: "Could not save your idea to the database. Please try again. " + error.message,
-            variant: "destructive"
-          });
-          setIsSubmitting(false);
-          return;
-        }
-      } else {
-        const submissions = JSON.parse(localStorage.getItem('ideaSubmissions') || '[]');
-        const localStorageSubmission = {
-          ...formData, 
-          id: Date.now(),
-          submittedAt: new Date().toISOString(),
-          status: 'pending_local'
-        };
-        submissions.push(localStorageSubmission);
-        localStorage.setItem('ideaSubmissions', JSON.stringify(submissions));
-
-        toast({
-          title: "Idea Saved Locally! ✅",
-          description: "Your idea is saved locally. Please complete Supabase integration to save it to the cloud!"
-        });
-      }
-
-      setFormData(initialFormData);
-      setIsSubmitting(false);
-    };
-
-    return (
-      <div className="min-h-screen pt-32 pb-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              className="inline-block mb-6"
-            >
-              <Lightbulb className="h-16 w-16 text-yellow-400 floating-animation" />
-            </motion.div>
-            <h1 className="text-4xl md:text-5xl font-bold gradient-text mb-4">
-              Submit Your Big Idea
-            </h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Share your innovative business concept and join the community of young entrepreneurs making a difference
-            </p>
-          </motion.div>
-
-          {!integrationCompleted && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="mb-8 p-4 rounded-lg glass-effect border border-yellow-500/50 flex items-center gap-4"
-            >
-              <AlertTriangle className="h-10 w-10 text-yellow-400" />
-              <div>
-                <h3 className="text-yellow-300 font-semibold text-lg">Supabase Integration Pending</h3>
-                <p className="text-yellow-200/80 text-sm">
-                  Your submissions are currently being saved to local storage. For secure cloud storage, please ensure Supabase is connected.
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            <Card className="glass-effect border-white/20">
-              <CardHeader>
-                <CardTitle className="text-white text-2xl flex items-center gap-2">
-                  <Send className="h-6 w-6" />
-                  Idea Submission Form
-                </CardTitle>
-                <CardDescription className="text-white/70">
-                  Fill out all the details about yourself and your innovative business idea
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <PersonalInfoForm formData={formData} handleInputChange={handleInputChange} />
-                  <SchoolInfoForm formData={formData} handleInputChange={handleInputChange} states={states} />
-                  <IdeaInfoForm formData={formData} handleInputChange={handleInputChange} categories={categories} />
-
-                  <motion.div
-                    whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                    whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                    className="pt-6"
-                  >
-                    <Button
-                      type="submit"
-                      size="lg"
-                      disabled={isSubmitting}
-                      className="w-full pulse-glow bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white py-6 text-lg disabled:opacity-70"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="mr-2"
-                          >
-                            <Database className="h-5 w-5" />
-                          </motion.div>
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="h-5 w-5 mr-2" />
-                          Submit My Idea
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                </form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </div>
-    );
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  export default Submit;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const requiredFields = formFields.map(f => f.name);
+    const missingFields = requiredFields.filter((field) => !form[field]);
+
+    if (missingFields.length > 0) {
+      toast({
+        title: 'Missing Information',
+        description: `Please fill out the following fields: ${missingFields.join(', ')}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setLoading(true);
+
+    // TODO: Replace this with a real API call to the NestJS backend
+    try {
+      console.log('Submitting form data:', form);
+      // Simulating a network request
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: 'Submitted Successfully!',
+        description: 'Your interest has been recorded. We will get in touch with you soon.',
+      });
+      
+      setForm({ name: '', age: '', school: '', grade: '', city: '', phone: '', email: '', program: '' });
+
+    } catch (error) {
+       toast({
+        title: 'Error',
+        description: 'There was a problem submitting your form. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 relative">
+      <GridPattern />
+
+      <div className="relative z-10 max-w-4xl mx-auto pt-32 pb-20 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-block bg-yellow-400/20 p-4 rounded-full mb-4">
+            <Lightbulb className="h-12 w-12 text-yellow-600" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900">Apply for a Program</h1>
+          <p className="text-slate-600 text-lg max-w-xl mx-auto mt-4">
+            Fill out this short form and we’ll get in touch with the next steps!
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-8 md:p-12">
+            <form onSubmit={handleSubmit}>
+              {/* --- Responsive Two-Column Grid --- */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                {formFields.map(({ label, name, type, placeholder, className }) => (
+                  <InputField
+                    key={name}
+                    id={name}
+                    name={name}
+                    label={label}
+                    type={type}
+                    placeholder={placeholder}
+                    value={form[name]}
+                    onChange={handleChange}
+                    className={className}
+                    required
+                  />
+                ))}
+
+                <motion.div className="md:col-span-2 mt-4" whileTap={{ scale: 0.98 }}>
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-3 bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-semibold py-3 px-6 rounded-lg shadow-lg shadow-yellow-400/20 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5" />
+                        Submit
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+              </div>
+            </form>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default ApplicationForm;
